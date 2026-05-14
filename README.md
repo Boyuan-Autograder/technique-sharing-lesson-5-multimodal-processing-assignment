@@ -1,109 +1,22 @@
-# technique-sharing-lesson-5-multimodal-processing-assignment
+# 多模态混合文件解析 — 课后练习
 
-## 课后练习：多模态处理技术
+> technique-sharing-lesson-5-multimodal-processing-assignment
 
-本作业模板用于练习综合运用多模态处理、结构化数据解析与语音转写技术。
-
----
-
-## 任务概述
-
-对一份混合格式的文件包进行全量解析，整合分散的信息，输出一份逻辑清晰、要素完整的"季度业务简报"。
-
----
-
-## 输入文件清单
-
-| 文件 | 类型 | 处理方式 |
-|------|------|----------|
-| `data/receipt.png` | 图片型收据 | Base64编码 → Kimi视觉识别API |
-| `data/sales.csv` | 结构化数据 | Pandas读取分析 → Markdown表格 |
-| `data/formula.png` | 手写公式 | Base64编码 → Kimi视觉API提取 |
-| `data/summary.mp3` | 录音文件 | Faster-Whisper本地语音转写 |
-
----
-
-## 输出标准
-
-你的程序最终需要生成一份 `output/report.md`，包含以下四个部分：
-
-### 1. 财务摘要
-- 收据金额
-- 业务发生日期
-
-### 2. 经营亮点
-- 本季度销售额 Top1 的产品
-
-### 3. 技术细节
-- 手写公式的含义与推导逻辑
-
-### 4. 决策录音
-- 完整转写文本
-- 核心观点摘要
-
----
-
-## 环境配置
-
-### 前置要求
-- Python 3.10+
-- [uv](https://github.com/astral-sh/uv) (包管理器)
-
-### 安装依赖
-
-```bash
-uv sync
-```
-
-### 环境变量
-
-创建 `.env` 文件，配置你的API密钥：
-
-```bash
-# Moonshot Kimi API (用于视觉识别)
-MOONSHOT_API_KEY=your_kimi_api_key_here
-```
-
-获取API Key: https://platform.moonshot.cn/
-
----
-
-## 项目结构
-
-```
-.
-├── README.md
-├── plan.md
-├── pyproject.toml
-├── .env.example
-├── .gitignore
-├── data/
-│   ├── receipt.png          # 输入：收据图片
-│   ├── sales.csv            # 输入：销售数据
-│   ├── formula.png          # 输入：手写公式
-│   └── summary.mp3          # 输入：语音录音
-├── src/
-│   └── multimodal_processor/
-│       ├── __init__.py
-│       ├── main.py          # 主程序入口
-│       ├── vision.py        # 视觉识别模块 (Kimi)
-│       ├── audio.py         # 语音转写模块 (Faster-Whisper)
-│       ├── csv_parser.py    # CSV解析模块
-│       └── report.py        # 报告生成模块
-├── output/
-│   └── report.md            # 输出：生成的简报
-└── tests/
-    └── test_processor.py   # 单元测试
-```
+综合运用**视觉识别**、**结构化数据解析**与**语音转写**技术，将一个包含多种格式的混合文件包全量解析为一份逻辑清晰的"季度业务简报"。
 
 ---
 
 ## 快速开始
 
-### 1. 克隆仓库
+### 0. 前置要求
+
+- Python 3.10+
+- [uv](https://github.com/astral-sh/uv)（Python 包管理器）
+
+### 1. 克隆并进入项目
 
 ```bash
-git clone <repository-url>
+git clone <repo-url>
 cd technique-sharing-lesson-5-multimodal-processing-assignment
 ```
 
@@ -113,79 +26,142 @@ cd technique-sharing-lesson-5-multimodal-processing-assignment
 uv sync
 ```
 
-### 3. 配置环境变量
+### 3. 配置 API Key
 
 ```bash
 cp .env.example .env
-# 编辑 .env 填入你的 Moonshot API Key
 ```
 
-### 4. 准备数据
+编辑 `.env`，填入你的 Kimi API Key：
 
-将以下文件放入 `data/` 目录：
-- `receipt.png` - 收据图片
-- `sales.csv` - 销售数据CSV
-- `formula.png` - 手写公式
-- `summary.mp3` - 语音录音
+```
+MOONSHOT_API_KEY=sk-your-api-key-here
+```
 
-### 5. 运行程序
+> 获取 Key：https://platform.moonshot.cn/ — 新用户有免费额度。
+
+### 4. 准备输入文件
+
+将以下 4 个文件放入 `data/` 目录：
+
+| 文件 | 类型 | 说明 |
+|------|------|------|
+| `data/receipt.png` | 收据图片 | 购物小票/发票照片 |
+| `data/sales.csv` | 结构化表格 | 季度销售记录 |
+| `data/formula.png` | 手写公式 | 手写数学公式图片 |
+| `data/summary.mp3` | 录音文件 | 会议录音（支持中文） |
+
+> 仓库自带示例数据（`data/` 目录下），可开箱即用。
+
+### 5. 运行
 
 ```bash
-uv run python -m multimodal_processor.main
+uv run -m multimodal_processor.main
 ```
+
+程序会依次处理 4 个文件，并在终端打印处理进度和大模型响应结果。
 
 ### 6. 查看输出
 
-生成的报告位于 `output/report.md`
+生成的报告位于 `output/report.md`，包含四个部分：
+
+1. **财务摘要** — 收据金额与日期
+2. **经营亮点** — 销售额 Top1 产品与排行
+3. **技术细节** — 手写公式的含义与推导
+4. **决策录音** — 完整转写文本与核心观点摘要
 
 ---
 
-## API说明
+## 项目结构
 
-本项目使用以下服务：
-
-### Moonshot Kimi Vision (视觉识别)
-- 用途：图像内容识别（收据、公式）
-- 文档：https://platform.moonshot.cn/docs/api/chat
-- 模型：`moonshot-v1-128k-vision-preview`
-
-### Faster-Whisper (本地语音转写)
-- 用途：音频转文字（完全本地，无需API）
-- 文档：https://github.com/guillaayak/faster-whisper
-- 模型：Whisper base（首次运行自动下载）
+```
+.
+├── README.md
+├── plan.md                          # 任务说明（给学生）
+├── pyproject.toml                   # 项目配置（uv + hatchling）
+├── .env.example                     # 环境变量模板
+├── .gitignore
+├── data/                            # 输入文件目录
+│   ├── receipt.png                  # 收据图片
+│   ├── sales.csv                    # 销售数据
+│   ├── formula.png                  # 手写公式
+│   └── summary.mp3                  # 会议录音
+├── src/multimodal_processor/        # 源代码
+│   ├── __init__.py
+│   ├── main.py                      # 主程序入口
+│   ├── vision.py                    # 视觉识别（Kimi）
+│   ├── audio.py                     # 语音转写（Faster-Whisper）
+│   ├── csv_parser.py                # CSV 解析（Pandas）
+│   └── report.py                    # 报告生成
+├── output/                          # 输出目录
+│   └── report.md                    # 生成的简报
+└── tests/
+    └── test_processor.py            # 单元测试
+```
 
 ---
 
-## 数据说明
+## 技术栈
 
-为方便测试，本仓库的 `data/` 目录包含**伪造的示例数据**（由你生成）。
-
----
-
-## 评分标准
-
-| 项目 | 分数 | 要求 |
+| 组件 | 技术 | 说明 |
 |------|------|------|
-| 财务摘要 | 25% | 准确提取收据金额和日期 |
-| 经营亮点 | 25% | 正确识别销售额Top1产品 |
-| 技术细节 | 25% | 正确解析公式含义 |
-| 决策录音 | 25% | 完整转写并提取核心观点 |
+| 视觉识别 | Moonshot Kimi Vision API | 识别收据图片和手写公式 |
+| 语音转写 | Faster-Whisper (本地) | 将 MP3 录音转为文字，无需 API |
+| 文本摘要 | Moonshot Kimi Chat API | 从转写文本中提取核心观点 |
+| 数据分析 | Pandas | 读取 CSV、汇总销售额、排行 |
+| 报告生成 | Python 字符串模板 | 输出 Markdown 格式报告 |
+
+### 使用的 API
+
+- **Kimi Vision API** (`moonshot-v1-128k-vision-preview`) — 图像内容识别
+- **Kimi Chat API** (`moonshot-v1-128k`) — 文本摘要与结构化提取
+- **Faster-Whisper** (`base` 模型) — 本地语音转写，首次运行自动下载约 75MB
 
 ---
 
 ## 常见问题
 
-### Q: 视觉API调用失败怎么办？
-A: 检查 `.env` 中的 `MOONSHOT_API_KEY` 是否正确配置。
+### Q: 运行时报 "未配置 API Key，使用模拟数据"？
 
-### Q: Whisper模型下载慢？
-A: 首次运行会自动下载模型（约75MB），可使用VPN加速。
+A: 检查 `.env` 中是否正确设置了 `MOONSHOT_API_KEY`。需要去 https://platform.moonshot.cn 申请。
 
-### Q: CSV编码问题？
-A: 确保CSV文件使用UTF-8编码。
+### Q: Whisper 模型下载慢？
+
+A: 首次运行会自动下载约 75MB 的模型文件。如网络受限，可配置代理后重试。
+
+### Q: 收据/公式识别失败？
+
+A: 确保图片文件存在且格式为 PNG。程序会自动把大图缩放到 1024px 宽度以节省 Token。
+
+### Q: CSV 读取报错？
+
+A: 确保 CSV 使用 UTF-8 编码，且包含 `product` 和 `sales` 两列。
+
+### Q: 没有 API Key 能运行吗？
+
+A: 可以。程序会使用内置的模拟数据生成报告，只是不会调用真实的视觉 API。
 
 ---
 
-## 许可
+## 运行测试
 
-本项目仅用于教学目的。
+```bash
+uv run pytest tests/ -v
+```
+
+---
+
+## 评分标准
+
+| 项目 | 权重 | 要求 |
+|------|------|------|
+| 财务摘要 | 25% | 准确提取收据金额和日期 |
+| 经营亮点 | 25% | 正确识别销售额 Top1 产品 |
+| 技术细节 | 25% | 正确解析公式含义 |
+| 决策录音 | 25% | 完整转写并提取核心观点 |
+
+---
+
+## License
+
+仅用于教学目的。

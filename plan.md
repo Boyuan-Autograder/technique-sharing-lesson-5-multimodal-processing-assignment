@@ -14,10 +14,10 @@
 
 ### 混合文件清单
 
-- `receipt.pdf`（图片型收据）：转Base64，调用多模态视觉识别API。
+- `receipt.png`（图片型收据）：转Base64，调用多模态视觉识别API。
 - `sales.csv`（结构化数据）：Pandas读取分析，转为Markdown表格。
-- `formula.jpg`（手写公式）：转Base64，调用多模态API提取信息。
-- `summary.m4a`（录音）：Whisper语音转写，提取关键要点。
+- `formula.png`（手写公式）：转Base64，调用多模态API提取信息。
+- `summary.mp3`（录音）：Whisper语音转写，提取关键要点。
 
 ---
 

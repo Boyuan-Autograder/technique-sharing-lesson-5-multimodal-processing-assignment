@@ -3,6 +3,16 @@ from pathlib import Path
 from io import StringIO
 
 
+def _df_to_markdown(df: pd.DataFrame) -> str:
+    cols = df.columns.tolist()
+    header = "| " + " | ".join(cols) + " |"
+    sep = "|" + "|".join([" --- " for _ in cols]) + "|"
+    rows = []
+    for _, row in df.iterrows():
+        rows.append("| " + " | ".join(str(v) for v in row) + " |")
+    return "\n".join([header, sep] + rows)
+
+
 class CSVParser:
     def analyze_sales(self, csv_path: Path) -> dict:
         if not csv_path.exists():
@@ -31,7 +41,7 @@ class CSVParser:
             "total_transactions": len(df),
             "product_ranking": sales_by_product.to_dict(),
             "data": df.to_dict(orient="records"),
-            "markdown_table": df.to_markdown(index=False),
+            "markdown_table": _df_to_markdown(df),
         }
 
     def _fake_sales_data(self) -> dict:
@@ -61,5 +71,5 @@ class CSVParser:
             "total_transactions": len(df),
             "product_ranking": sales_by_product.to_dict(),
             "data": df.to_dict(orient="records"),
-            "markdown_table": df.to_markdown(index=False),
+            "markdown_table": _df_to_markdown(df),
         }

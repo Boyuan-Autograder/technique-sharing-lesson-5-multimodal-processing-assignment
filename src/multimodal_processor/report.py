@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 
 
@@ -9,30 +10,32 @@ class ReportGenerator:
         formula_data: dict,
         transcript_data: dict,
     ) -> str:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M")
+
         report = f"""# 季度业务简报
 
-> 数据来源：多模态混合文件包解析
+> 生成时间：{now}
+> 数据来源：多模态混合文件包解析（收据 + 销售表 + 公式 + 录音）
 
 ---
 
-## 1. 财务摘要
+## 一、财务摘要
 
 | 项目 | 内容 |
 |------|------|
 | 收据金额 | {receipt_data.get('amount', 'N/A')} |
-| 业务发生日期 | {receipt_data.get('date', 'N/A')} |
+| 业务日期 | {receipt_data.get('date', 'N/A')} |
 | 商品明细 | {receipt_data.get('items', 'N/A')} |
 
 ---
 
-## 2. 经营亮点
+## 二、经营亮点
 
-### 销售额 Top1 产品
+### 销售额 Top1 产品：**{sales_data.get('top_product', 'N/A')}**
 
-**{sales_data.get('top_product', 'N/A')}**
-
-- 销售额：¥{sales_data.get('top_product_sales', 0):,}
+- 季度总销售额：¥{sales_data.get('top_product_sales', 0):,.0f}
 - 占总营收比例：{self._calculate_percentage(sales_data):.1f}%
+- 全季度交易笔数：{sales_data.get('total_transactions', 0)}
 
 ### 产品销售排行
 
@@ -40,17 +43,17 @@ class ReportGenerator:
 
 ---
 
-## 3. 技术细节
+## 三、技术细节
 
-### 公式解析
+### 手写公式解析
 
 {formula_data.get('formula', 'N/A')}
 
 ---
 
-## 4. 决策录音
+## 四、决策录音
 
-### 完整转写文本
+### 录音转写文本
 
 {transcript_data.get('transcript', 'N/A')}
 
@@ -64,22 +67,21 @@ class ReportGenerator:
 
 ---
 
-## 附录：原始数据
-
-### 销售数据表
+## 附录：原始销售数据
 
 {sales_data.get('markdown_table', 'N/A')}
 
 ---
 
-*本报告由多模态AI处理程序自动生成*
+*本报告由多模态 AI 处理程序自动生成*
 """
-
         return report
 
     def _calculate_percentage(self, sales_data: dict) -> float:
         top_sales = sales_data.get("top_product_sales", 0)
         total = sales_data.get("total_revenue", 1)
+        if total == 0:
+            return 0.0
         return (top_sales / total) * 100
 
     def _format_product_ranking(self, ranking: dict) -> str:
@@ -88,7 +90,7 @@ class ReportGenerator:
 
         lines = []
         for i, (product, sales) in enumerate(ranking.items(), 1):
-            lines.append(f"{i}. **{product}** - ¥{sales:,}")
+            lines.append(f"{i}. **{product}** — ¥{sales:,.0f}")
         return "\n".join(lines)
 
     def _format_key_points(self, key_points: list) -> str:

@@ -81,10 +81,10 @@ class TestReportGenerator:
 
     def test_report_contains_all_sections(self):
         report = self.generator.generate(**self.fake_data)
-        assert "## 1. 财务摘要" in report
-        assert "## 2. 经营亮点" in report
-        assert "## 3. 技术细节" in report
-        assert "## 4. 决策录音" in report
+        assert "一、财务摘要" in report
+        assert "二、经营亮点" in report
+        assert "三、技术细节" in report
+        assert "四、决策录音" in report
 
     def test_percentage_calculation(self):
         pct = self.generator._calculate_percentage(self.fake_data["sales_data"])
